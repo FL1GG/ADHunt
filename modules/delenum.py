@@ -70,7 +70,12 @@ class DelegationEnumeration:
                     name = str(self.c.response[i]["attributes"]["samaccountname"])
 
                     sF = '(|'
-                    sd = ldaptypes.SR_SECURITY_DESCRIPTOR(data=bytes(self.c.response[i]["attribute"]["msDS-AllowedToActOnBehalfOfOtherIdentity"]))
+
+                    if("attribute" in self.c.response[i]): # certain AD cases do not have the following key
+                        sd = ldaptypes.SR_SECURITY_DESCRIPTOR(data=bytes(self.c.response[i]["attribute"]["msDS-AllowedToActOnBehalfOfOtherIdentity"]))
+                    else:
+                        continue # skip entry
+                    
                     for ace in sd['Dacl'].aces:
                         sF = sF + "(objectSid="+ace['Ace']['Sid'].formatCanonical()+")"
                     sF = sF + ')'
